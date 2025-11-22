@@ -11,8 +11,9 @@ co-occurrence structure.
 lexical_purity/
 ├── data/
 │   ├── processed/   # JSONL docs, term indices, term-frequency maps
-│   └── results/     # Purity metrics, Jaccard tables, spectra
-├── scripts/        # Numbered pipeline stages (1–6) plus utilities
+│   ├── results/     # Purity metrics, Jaccard tables, spectra
+│   └── visuals/     # Graphviz DOT files and rendered trees
+├── scripts/        # Numbered pipeline stages (1–7) plus utilities
 └── README.md
 ```
 
@@ -38,6 +39,7 @@ intermediate artifacts.
 | 4 | `scripts/4_term_term_jaccard.py` | Build document sets for high-purity terms and measure pairwise Jaccard overlaps. | `data/results/term_term_jaccard_<variant>.csv` |
 | 5 | `scripts/5_jaccard_spectrum.py` | Treat the Jaccard table as a similarity matrix and study its eigen spectrum and leading eigenvector loadings. | `<base>_spectrum.csv`, `<base>_eigvec1_loadings.csv` |
 | 6 | `scripts/6_recursive_purity_tree.py` | Recursively split documents on the best `G_true` term to visualize hierarchical purity structure. | `data/results/purity_tree_<variant>.json` |
+| 7 | `scripts/7_visualize_purity_tree.py` | Convert the saved purity tree into a Graphviz DOT file for rendering. | `data/visuals/purity_tree_<variant>.dot` (then render to PNG/SVG via `dot`) |
 
 > **Variants:** `clean` removes stopwords; `nostop` retains them. Step 1 can
 > generate both variants; subsequent steps take a `--variant` flag.
@@ -64,6 +66,10 @@ python scripts/5_jaccard_spectrum.py --variant clean --tag g0.15
 
 # Step 6: purity decision tree capped at depth 5
 python scripts/6_recursive_purity_tree.py --variant clean --max_depth 5 --top_k 10
+
+# Step 7: Graphviz visualization of the purity tree (requires Graphviz)
+python scripts/7_visualize_purity_tree.py --variant clean --max_depth 5
+dot -Tpng data/visuals/purity_tree_clean.dot -o data/visuals/purity_tree_clean.png
 ```
 
 ## Notes and tips
